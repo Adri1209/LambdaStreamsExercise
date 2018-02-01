@@ -127,9 +127,10 @@ public class LambdaTests {
     private HashMap<String, Integer> castAverageToInteger(Map<String, Double> map) {
 
         HashMap<String, Integer> newMap = new HashMap<>();
-        newMap.put("c", map.get("c").intValue());
-        newMap.put("b", map.get("b").intValue());
-        newMap.put("a", map.get("a").intValue());
+        for(Map.Entry<String, Double> i : map.entrySet()) {
+            newMap.put(i.getKey(), (int) (double) i.getValue());
+        }
+
         return newMap;
 }
 
