@@ -1,15 +1,13 @@
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class Application {
     private List<Record> records = new ArrayList<>();
@@ -82,10 +80,10 @@ public class Application {
     public void executeSQL05() {
         records = new ArrayList<>(recordcopy);
 
-        Predicate<Record> filter = s -> s.getSeverity().equals("minor") && (s.getAttackType().equals("a") || s.getAttackType().equals("b")) && s.getSource() ==1 && s.getShift() == 4 && s.getDowntimeInMinutes() >= 195;
+        Predicate<Record> filter = s -> s.getSeverity().equals("minor") && (s.getAttackType().equals("a") || s.getAttackType().equals("b")) && s.getSource() == 1 && s.getShift() == 4 && s.getDowntimeInMinutes() >= 195;
         Comparator<Record> descending = (Record record01, Record record02) -> (int) (record02.getDowntimeInMinutes() - record01.getDowntimeInMinutes());
-        List<Record> record= records.stream().filter(filter).collect(Collectors.toList());
-        Collections.sort(record,descending);
+        List<Record> record = records.stream().filter(filter).collect(Collectors.toList());
+        Collections.sort(record, descending);
         List<Integer> ids = record.stream().limit(3).map(x -> x.getId()).collect(Collectors.toList());
         ids.forEach(System.out::println);
         System.out.println();
@@ -99,7 +97,7 @@ public class Application {
         Comparator<Record> comparator = (Record record01, Record record02) -> (int) (record02.getSeverity().compareTo(record01.getSeverity()));
         comparator = comparator.thenComparing(Comparator.comparing(record -> record.getDowntimeInMinutes()));
         List<Record> record = records.stream().filter(filter).collect(Collectors.toList());
-        Collections.sort(record,comparator);
+        Collections.sort(record, comparator);
         List<Integer> ids = record.stream().map(x -> x.getId()).collect(Collectors.toList());
         ids.forEach(System.out::println);
         System.out.println();
@@ -108,26 +106,71 @@ public class Application {
 
     // count, group by
     public void executeSQL07() {
+        records = new ArrayList<>(recordcopy);
+
+        Map<String, Long> result = records.stream().collect(Collectors.groupingBy(Record::getSeverity, Collectors.counting()));
+
+        System.out.println(result);
+        System.out.println();
+
     }
 
     // count, where, group by
     public void executeSQL08() {
+        records = new ArrayList<>(recordcopy);
+
+        Map<Integer, Long> result = records.stream().filter(s -> s.getAttackType().equals("d") && s.getSeverity().equals("major"))
+                .collect(Collectors.groupingBy(Record::getShift, Collectors.counting()));
+
+        System.out.println(result);
+        System.out.println();
     }
 
     // count, where, in, group by
     public void executeSQL09() {
+        records = new ArrayList<>(recordcopy);
+
+        Map<String, Long> result = records.stream().filter(s -> (s.getAttackType().equals("a") || s.getAttackType().equals("b") || s.getAttackType().equals("c")) && s.getSource() == 3)
+                .collect(Collectors.groupingBy(Record::getAttackType, Collectors.counting()));
+
+        System.out.println(result);
+        System.out.println();
     }
 
     // count, where, not in, group by
     public void executeSQL10() {
+        records = new ArrayList<>(recordcopy);
+
+        Predicate<Record> filter = s-> !(s.getAttackType().equals("b") || s.getAttackType().equals("d") || s.getAttackType().equals("e")) && s.getShift() >= 2 && s.getDowntimeInMinutes() >= 30 && s.getDowntimeInMinutes() <= 90;
+        Map<Integer, Long> result = records.stream().filter(filter)
+                .collect(Collectors.groupingBy(Record::getSource, Collectors.counting()));
+
+        System.out.println(result);
+        System.out.println();
     }
 
     // sum, where, not in, in, group by
     public void executeSQL11() {
+        records = new ArrayList<>(recordcopy);
+
+        Predicate<Record> filter = s-> !(s.getAttackType().equals("b") || s.getAttackType().equals("d") || s.getAttackType().equals("e")) && s.getShift() == 1 && (s.getSource() == 1 || s.getSource() == 3);
+        Map<String, Integer> result = records.stream().filter(filter)
+                .collect(Collectors.groupingBy(r -> r.getAttackType(), Collectors.summingInt(d -> d.getDowntimeInMinutes())));
+
+        System.out.println(result);
+        System.out.println();
     }
 
     // avg, where, in, in, group by
     public void executeSQL12() {
+        records = new ArrayList<>(recordcopy);
+
+        Predicate<Record> filter = s-> (s.getSeverity().equals("minor") || s.getSeverity().equals("major")) && (s.getAttackType().equals("a") || s.getAttackType().equals("b") || s.getAttackType().equals("c")) && s.getSource() == 1 && s.getShift() >= 3;
+        Map<String, Double> result = records.stream().filter(filter)
+                .collect(Collectors.groupingBy(r -> r.getAttackType(), Collectors.averagingInt(d -> d.getDowntimeInMinutes())));
+
+        System.out.println(result);
+        System.out.println();
     }
 
     public void execute() {
