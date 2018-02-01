@@ -1,3 +1,5 @@
+package main;
+
 public interface IQuery {
     void executeSQL01();
     void executeSQL02();
