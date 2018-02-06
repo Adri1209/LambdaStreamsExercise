@@ -3,6 +3,7 @@ package test;
 import main.Application;
 import org.junit.Before;
 import org.junit.Test;
+
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -119,20 +120,8 @@ public class LambdaTests {
         expected.put("c", 122);
         expected.put("b", 123);
         expected.put("a", 122);
-        HashMap<String, Integer> actual = castAverageToInteger(application.executeSQL12());
-        assertEquals(expected,actual);
-
+        assertEquals(expected, application.executeSQL12());
     }
-
-    private HashMap<String, Integer> castAverageToInteger(Map<String, Double> map) {
-
-        HashMap<String, Integer> newMap = new HashMap<>();
-        for(Map.Entry<String, Double> i : map.entrySet()) {
-            newMap.put(i.getKey(), (int) (double) i.getValue());
-        }
-
-        return newMap;
-}
 
 
 }

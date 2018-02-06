@@ -98,7 +98,7 @@ public class Application {
     }
 
     // count, group by
-    public Map<String,Long> executeSQL07() {
+    public Map<String, Long> executeSQL07() {
         records = new ArrayList<>(recordcopy);
 
         Map<String, Long> result = records.stream().collect(Collectors.groupingBy(Record::getSeverity, Collectors.counting()));
@@ -109,7 +109,7 @@ public class Application {
     }
 
     // count, where, group by
-    public Map<Integer,Long> executeSQL08() {
+    public Map<Integer, Long> executeSQL08() {
         records = new ArrayList<>(recordcopy);
 
         Map<Integer, Long> result = records.stream().filter(s -> s.getAttackType().equals("d") && s.getSeverity().equals("major"))
@@ -121,7 +121,7 @@ public class Application {
     }
 
     // count, where, in, group by
-    public Map<String,Long> executeSQL09() {
+    public Map<String, Long> executeSQL09() {
         records = new ArrayList<>(recordcopy);
 
         Map<String, Long> result = records.stream().filter(s -> (s.getAttackType().equals("a") || s.getAttackType().equals("b") || s.getAttackType().equals("c")) && s.getSource() == 3)
@@ -133,10 +133,10 @@ public class Application {
     }
 
     // count, where, not in, group by
-    public Map<Integer,Long> executeSQL10() {
+    public Map<Integer, Long> executeSQL10() {
         records = new ArrayList<>(recordcopy);
 
-        Predicate<Record> filter = s-> !(s.getAttackType().equals("b") || s.getAttackType().equals("d") || s.getAttackType().equals("e")) && s.getShift() >= 2 && s.getDowntimeInMinutes() >= 30 && s.getDowntimeInMinutes() <= 90;
+        Predicate<Record> filter = s -> !(s.getAttackType().equals("b") || s.getAttackType().equals("d") || s.getAttackType().equals("e")) && s.getShift() >= 2 && s.getDowntimeInMinutes() >= 30 && s.getDowntimeInMinutes() <= 90;
         Map<Integer, Long> result = records.stream().filter(filter)
                 .collect(Collectors.groupingBy(Record::getSource, Collectors.counting()));
 
@@ -146,10 +146,10 @@ public class Application {
     }
 
     // sum, where, not in, in, group by
-    public Map<String,Integer> executeSQL11() {
+    public Map<String, Integer> executeSQL11() {
         records = new ArrayList<>(recordcopy);
 
-        Predicate<Record> filter = s-> !(s.getAttackType().equals("b") || s.getAttackType().equals("d") || s.getAttackType().equals("e")) && s.getShift() == 1 && (s.getSource() == 1 || s.getSource() == 3);
+        Predicate<Record> filter = s -> !(s.getAttackType().equals("b") || s.getAttackType().equals("d") || s.getAttackType().equals("e")) && s.getShift() == 1 && (s.getSource() == 1 || s.getSource() == 3);
         Map<String, Integer> result = records.stream().filter(filter)
                 .collect(Collectors.groupingBy(r -> r.getAttackType(), Collectors.summingInt(d -> d.getDowntimeInMinutes())));
 
@@ -159,12 +159,17 @@ public class Application {
     }
 
     // avg, where, in, in, group by
-    public Map<String,Double> executeSQL12() {
+    public Map<String, Integer> executeSQL12() {
         records = new ArrayList<>(recordcopy);
 
-        Predicate<Record> filter = s-> (s.getSeverity().equals("minor") || s.getSeverity().equals("major")) && (s.getAttackType().equals("a") || s.getAttackType().equals("b") || s.getAttackType().equals("c")) && s.getSource() == 1 && s.getShift() >= 3;
-        Map<String, Double> result = records.stream().filter(filter)
+        Predicate<Record> filter = s -> (s.getSeverity().equals("minor") || s.getSeverity().equals("major")) && (s.getAttackType().equals("a") || s.getAttackType().equals("b") || s.getAttackType().equals("c")) && s.getSource() == 1 && s.getShift() >= 3;
+        Map<String, Double> doubleMap = records.stream().filter(filter)
                 .collect(Collectors.groupingBy(r -> r.getAttackType(), Collectors.averagingInt(d -> d.getDowntimeInMinutes())));
+
+        HashMap<String, Integer> result = new HashMap<>();
+        for (Map.Entry<String, Double> i : doubleMap.entrySet()) {              // convert Double values to Integer
+            result.put(i.getKey(), (int) (double) i.getValue());
+        }
 
         System.out.println(result);
         System.out.println();
